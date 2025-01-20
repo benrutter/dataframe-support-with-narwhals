@@ -89,7 +89,7 @@ image: https://images.unsplash.com/photo-1658792726665-3c0fe0f27373
 
 # Pre-Narwhals
 
-Soda-core (amazing) manages to support *a lot* of dataframes, this is a pretty impressive feat, here's [a view of Soda's folder structure](https://github.com/sodadata/soda-core/tree/main/soda):
+Soda-core (amazingly) manages to support *a lot* of dataframes, this is a pretty impressive feat, here's [a view of Soda's folder structure](https://github.com/sodadata/soda-core/tree/main/soda):
 
 ```
 📂 soda
@@ -211,7 +211,7 @@ print(f"{top_sleuth} is the best sleuth!")
 ---
 
 # Narwhals supports a bunch of dataframes!
-Currently supported dataframe engined
+Currently supported dataframe engines
 
 - 🐼 Pandas
 - 🐻‍❄️ Polars
