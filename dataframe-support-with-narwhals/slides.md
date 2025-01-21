@@ -60,7 +60,7 @@ After multiple failed attempts at finding support groups for victims of unpredic
 ```
 ---
 
-# A long time ago. . 
+# A long time ago. . .
 
 Difficulties of data testing with different dataframe engines
 
@@ -79,7 +79,6 @@ results = testable_df.validate(expectation_suite=get_tests_to_run())
 Wouldn't it be great if we could just give great-expectations any dataframe type we wanted?
 
 ...except that involves *a lot* of work.
-
 
 
 ---
@@ -298,8 +297,10 @@ a["nw.col('a')"] --> b["nw._pandas_like.PandasLikeExpr.col('a')"] --> c["lambda 
 
 ---
 
+
 # Final Example
 
+Slightly simplified version of Wimsey's entire dataframe code
 
 ```python
 @nw.narwhalify
@@ -311,14 +312,105 @@ def describe(
 
     Note this code is adapted from polars own descrip function.
     """
+    # Determine which columns should get std/mean/percentile statistics
     stat_cols = {c for c, dt in df.schema.items() if dt.is_numeric()}
-    required_exprs: list = []
-    required_exprs += [nw.col(c).mean().alias(f"mean_{c}") for c in stats_cols]
-    required_exprs += [nw.col(c).std().alias(f"std_{c}") for c in stats_cols]
-    df_metrics = df.select(*required_exprs)
-    return {k: v[0] for k, v in df_metrics.to_dict(as_series=False).items()}
+    required_exprs: list = [
+        nw.lit("_^&^_".join(df.columns)).alias("columns"),
+    ]
+    post_exprs: list = []
+    required_exprs += [
+        (nw.col(c).mean() if c in stat_cols else nw.lit(None)).alias(f"mean_{c}")
+        for c in columns_to_check
+    ]
+```
+
+---
+
+# Final Example
+
+Slightly simplified version of Wimsey's entire dataframe code
+
+```python
+    required_exprs += [
+        (nw.col(c).std() if c in stat_cols else nw.lit(None)).alias(f"std_{c}")
+        for c in columns_to_check
+    ]
+    required_exprs += [
+        (nw.col(c).min() if c in stat_cols else nw.lit(None)).alias(f"min_{c}")
+        for c in columns_to_check
+    ]
+    required_exprs += [
+        (nw.col(c).max() if c in stat_cols else nw.lit(None)).alias(f"max_{c}")
+        for c in columns_to_check
+    ]
+    required_exprs += [
+        nw.lit(str(df.schema[c])).alias(f"type_{c}") for c in columns_to_check
+    ]
+    required_exprs += [nw.col(*columns_to_check).count().name.prefix("count_")]
+```
+
+---
+
+
+# Final Example
+
+Slightly simplified version of Wimsey's entire dataframe code
+
+```python
+    post_exprs += [
+        (
+            nw.col(f"null_count_{c}")
+            / (nw.col(f"count_{c}") + nw.col(f"null_count_{c}"))
+        ).alias(f"null_percentage_{c}")
+        for c in columns_to_check
+    ]
+    post_exprs += [
+        (
+            nw.col(f"count_{columns_to_check[0]}")
+            + nw.col(f"null_count_{columns_to_check[0]}")
+        ).alias("length")
+    ]
+    df_metrics = df.select(
+        *required_exprs,
+    ).with_columns(*post_exprs)
+```
+
+---
+
+# Final Example
+
+Slightly simplified version of Wimsey's entire dataframe code
+
+```python
+    try:
+        return {k: v[0] for k, v in df_metrics.to_dict(as_series=False).items()}  # type: ignore[union-attr]
+    except AttributeError:
+        return {
+                k: v[0]
+                for k, v in df_metrics.collect().to_dict(as_series=False).items()  # type: ignore[union-attr]
+            }
+```
+
+Output is a dictionary with summary information on a given dataframe:
+
+```python
+{"col_a_mean": 34.23, "col_a_max": 434, "col_a_std": 23, ... }
 ```
 
 ---
 
 # Resources / Further Reading
+
+- Narwhal's Stuff
+  - [github](https://github.com/narwhals-dev/narwhals)
+  - [docs](https://narwhals-dev.github.io/narwhals/)
+  - [discord](https://discord.com/invite/V3PqtB4VA4)
+- Wimsey stuff
+  - [github](https://github.com/benrutter/wimsey)
+  - [docs](https://benrutter.github.io/wimsey/)
+- Other talks / Resources
+  - [Understanding Expressions When You're Used to Pandas](https://www.youtube.com/watch?v=kPtUPe5Egak)
+- Other things mentioned
+  - [Great Expectations](https://greatexpectations.io/)
+  - [Soda-Core](https://www.soda.io/)
+  - [Polars](https://pola.rs/)
