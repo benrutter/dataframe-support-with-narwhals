@@ -404,12 +404,12 @@ Output is a dictionary with summary information on a given dataframe:
 - Narwhal's Stuff
   - [github](https://github.com/narwhals-dev/narwhals)
   - [docs](https://narwhals-dev.github.io/narwhals/)
-  - [discord](https://discord.com/invite/V3PqtB4VA4)
 - Wimsey stuff
   - [github](https://github.com/benrutter/wimsey)
   - [docs](https://benrutter.github.io/wimsey/)
 - Other talks / Resources
   - [Understanding Expressions When You're Used to Pandas](https://www.youtube.com/watch?v=kPtUPe5Egak)
+  - [How Narwhals Works](https://narwhals-dev.github.io/narwhals/how_it_works/)
 - Other things mentioned
   - [Great Expectations](https://greatexpectations.io/)
   - [Soda-Core](https://www.soda.io/)
